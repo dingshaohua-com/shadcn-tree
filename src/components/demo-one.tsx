@@ -3,7 +3,7 @@ import { treeDate } from '../utils/mock-data';
 
 const DemoOne = () => {
   return (
-    <div className="bg-amber-200 w-110  rounded-2xl h-160 overflow-y-auto">
+    <div className="bg-gray-50 w-110  rounded-2xl h-160 overflow-y-auto">
       <Tree
         data={treeDate}
         checkable={true}

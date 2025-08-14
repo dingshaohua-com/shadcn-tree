@@ -52,6 +52,7 @@ export const TreeNode = ({
         <AccordionItem value={item.id}>
           <div className="flex items-center justify-between">
             <AccordionTrigger
+              hideChevron={true}
               className={cn(
                 "before:bg-muted/80 flex-1 px-2 before:absolute before:left-0 before:-z-10 before:h-[1.75rem] before:w-full before:opacity-0 hover:no-underline hover:before:opacity-100",
                 selectedItemId === item.id &&
