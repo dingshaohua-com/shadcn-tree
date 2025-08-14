@@ -64,13 +64,11 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
 
     const handleCheckChange = React.useCallback(
       (itemId: string, checked: boolean) => {
-        const { newCheckedKeys, newHalfCheckedKeys } = updateCheckState(
-          itemId,
-          checked
-        );
-        onCheckedChange?.(newCheckedKeys, newHalfCheckedKeys);
+        const { newCheckedKeys } = updateCheckState(itemId, checked);
+        // halfCheckedKeys 现在是计算属性，需要重新计算
+        onCheckedChange?.(newCheckedKeys, halfCheckedKeys);
       },
-      [updateCheckState, onCheckedChange]
+      [updateCheckState, onCheckedChange, halfCheckedKeys]
     );
 
     const treeData = normalizedData;
