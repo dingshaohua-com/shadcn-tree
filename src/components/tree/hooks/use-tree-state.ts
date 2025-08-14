@@ -1,5 +1,6 @@
 import React from "react";
 import { TreeDataItem } from "../types";
+import { getAllChildrenIds, calculateHalfCheckedKeys } from "../utils";
 
 export const useTreeState = (
   data: TreeDataItem[] | TreeDataItem,
@@ -10,46 +11,14 @@ export const useTreeState = (
   const [expandedIds, setExpandedIds] = React.useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>(initialCheckedKeys);
 
-  const getAllChildrenIds = React.useCallback((item: TreeDataItem): string[] => {
-    const ids: string[] = [];
-    if (item.children) {
-      item.children.forEach((child) => {
-        ids.push(child.id);
-        ids.push(...getAllChildrenIds(child));
-      });
-    }
-    return ids;
-  }, []);
+
 
   // 计算半选中状态
   const halfCheckedKeys = React.useMemo(() => {
-    const halfChecked: string[] = [];
-
-    const calculateHalfChecked = (nodes: TreeDataItem[] | TreeDataItem) => {
-      const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
-
-      for (const node of nodeArray) {
-        if (node.children && node.children.length > 0) {
-          // 先递归处理子节点
-          calculateHalfChecked(node.children);
-
-          // 计算当前节点的状态
-          const childrenIds = node.children.map(child => child.id);
-          const checkedChildren = childrenIds.filter(id => checkedKeys.includes(id));
-          const halfCheckedChildren = childrenIds.filter(id => halfChecked.includes(id));
-
-          // 如果有部分子节点被选中或半选中，但不是全部，则当前节点为半选中
-          if ((checkedChildren.length > 0 || halfCheckedChildren.length > 0) &&
-              checkedChildren.length < childrenIds.length) {
-            halfChecked.push(node.id);
-          }
-        }
-      }
-    };
-
-    calculateHalfChecked(data);
-    return halfChecked;
+    return calculateHalfCheckedKeys(data, checkedKeys);
   }, [checkedKeys, data]);
+
+
 
   const updateCheckState = React.useCallback((itemId: string, checked: boolean) => {
     let newCheckedKeys = [...checkedKeys];

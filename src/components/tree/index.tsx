@@ -5,6 +5,7 @@ import React from "react";
 import { TreeList } from "./components/tree-list";
 import { useTreeState } from "./hooks/use-tree-state";
 import { TreeDataItem, TreeProps } from "./types";
+import { calculateHalfCheckedKeys, calculateLeafCheckedKeys } from "./utils";
 
 const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
   (
@@ -65,16 +66,21 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
     const handleCheckChange = React.useCallback(
       (itemId: string, checked: boolean) => {
         const { newCheckedKeys } = updateCheckState(itemId, checked);
-        // halfCheckedKeys 现在是计算属性，需要重新计算
-        onCheckedChange?.(newCheckedKeys, halfCheckedKeys);
+
+        // 基于新的 checkedKeys 重新计算 halfCheckedKeys 和 leafCheckedKeys
+        const newHalfCheckedKeys = calculateHalfCheckedKeys(normalizedData, newCheckedKeys);
+        const newLeafCheckedKeys = calculateLeafCheckedKeys(normalizedData, newCheckedKeys);
+
+        onCheckedChange?.(newCheckedKeys, newHalfCheckedKeys, newLeafCheckedKeys);
       },
-      [updateCheckState, onCheckedChange, halfCheckedKeys]
+      [updateCheckState, onCheckedChange, normalizedData]
     );
 
     const treeData = normalizedData;
 
     return (
       <div className={cn("overflow-hidden", className)} ref={ref} {...props}>
+        <div>---{currentCheckedKeys.toString()}</div>
         <TreeList
           data={treeData}
           selectedItemId={selectedItemId}

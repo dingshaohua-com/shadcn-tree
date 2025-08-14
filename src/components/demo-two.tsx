@@ -4,9 +4,9 @@ import { Button } from '@/components/ui/components/button';
 import { DropdownMenu, DropdownMenuContent, DropdownMenuTrigger } from '@/components/ui/components/dropdown-menu';
 
 export default function DemoTwo() {
-  const onCheckedChange = ()=>{
-    
-  }
+  const onCheckedChange = (a, b, leafCheckedKeys: string[]) => {
+    console.log(leafCheckedKeys);
+  };
   return (
     <div className="p-10">
       <DropdownMenu>
@@ -31,7 +31,6 @@ export default function DemoTwo() {
                 </>
               )}
               prefixCheckbox={({ item, level }) => {
-                console.log({ item, level });
                 return (
                   <div className="text-sm">
                     {level === 0 ? (

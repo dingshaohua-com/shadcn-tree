@@ -19,7 +19,6 @@ const DemoOne = () => {
           </>
         )}
         prefixCheckbox={({ item, level }) => {
-          console.log({ item, level });
           return (
             <div className="text-sm">
               {level === 0 ? (
