@@ -31,7 +31,7 @@ export const useTreeState = (
       if (!newCheckedKeys.includes(itemId)) {
         newCheckedKeys.push(itemId);
       }
-      
+
       // 找到当前项并添加所有子节点
       const findAndAddChildren = (nodes: TreeDataItem[] | TreeDataItem) => {
         const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
@@ -51,7 +51,7 @@ export const useTreeState = (
         }
       };
       findAndAddChildren(data);
-      
+
       // 移除半选中状态
       newHalfCheckedKeys = newHalfCheckedKeys.filter(id => id !== itemId);
     } else {
@@ -72,16 +72,20 @@ export const useTreeState = (
       findAndRemoveChildren(data);
     }
 
-    // 更新父节点的半选中状态
+    // 更新父节点的半选中状态 - 从底向上递归
     const updateParentStates = (nodes: TreeDataItem[] | TreeDataItem) => {
       const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
-      
+
       for (const node of nodeArray) {
-        if (node.children) {
+        if (node.children && node.children.length > 0) {
+          // 先递归处理子节点
+          updateParentStates(node.children);
+
+          // 然后处理当前节点
           const childrenIds = node.children.map(child => child.id);
           const checkedChildren = childrenIds.filter(id => newCheckedKeys.includes(id));
           const halfCheckedChildren = childrenIds.filter(id => newHalfCheckedKeys.includes(id));
-          
+
           if (checkedChildren.length === 0 && halfCheckedChildren.length === 0) {
             // 没有子节点被选中或半选中，移除父节点的选中和半选中状态
             newCheckedKeys = newCheckedKeys.filter(id => id !== node.id);
@@ -99,17 +103,15 @@ export const useTreeState = (
               newHalfCheckedKeys.push(node.id);
             }
           }
-          
-          updateParentStates(node.children);
         }
       }
     };
-    
+
     updateParentStates(data);
 
     setCheckedKeys(newCheckedKeys);
     setHalfCheckedKeys(newHalfCheckedKeys);
-    
+
     return { newCheckedKeys, newHalfCheckedKeys };
   }, [checkedKeys, halfCheckedKeys, data, getAllChildrenIds]);
 
