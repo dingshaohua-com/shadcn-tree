@@ -1,4 +1,4 @@
-import React from "react";
+import React,{useEffect} from "react";
 import { TreeDataItem } from "../types";
 import { getAllChildrenIds, calculateHalfCheckedKeys } from "../utils";
 
@@ -10,6 +10,11 @@ export const useTreeState = (
   const [selectedItemId, setSelectedItemId] = React.useState<string | undefined>(initialSelectedId);
   const [expandedIds, setExpandedIds] = React.useState<string[]>([]);
   const [checkedKeys, setCheckedKeys] = React.useState<string[]>(initialCheckedKeys);
+
+  // 响应外部 checkedKeys 的变化
+  useEffect(() => {
+    setCheckedKeys(initialCheckedKeys);
+  }, [initialCheckedKeys]);
 
 
 
