@@ -9,7 +9,7 @@ export default function DemoTwo() {
   const [checkedKeys, setCheckedKeys] = useState<string[]>([]);
   const [leafCheckedKeys, setLeafCheckedKeys] = useState<string[]>([]);
 
-  const onCheckedChange = (allCheckedKeys: string[], halfCheckedKeys: string[], leafCheckedKeys: string[]) => {
+  const onCheckedChange = (allCheckedKeys: string[], leafCheckedKeys: string[]) => {
     console.log('All checked keys:', allCheckedKeys);
     console.log('Leaf checked keys:', leafCheckedKeys);
     // 保存完整的选中状态

@@ -71,7 +71,7 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
         const newHalfCheckedKeys = calculateHalfCheckedKeys(normalizedData, newCheckedKeys);
         const newLeafCheckedKeys = calculateLeafCheckedKeys(normalizedData, newCheckedKeys);
 
-        onCheckedChange?.(newCheckedKeys, newHalfCheckedKeys, newLeafCheckedKeys);
+        onCheckedChange?.(newCheckedKeys, newLeafCheckedKeys, newHalfCheckedKeys, );
       },
       [updateCheckState, onCheckedChange, normalizedData]
     );
@@ -80,7 +80,6 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
 
     return (
       <div className={cn("overflow-hidden", className)} ref={ref} {...props}>
-        <div>---{currentCheckedKeys.toString()}</div>
         <TreeList
           data={treeData}
           selectedItemId={selectedItemId}
