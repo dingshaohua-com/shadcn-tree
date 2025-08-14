@@ -19,7 +19,7 @@ export function absoluteUrl(path: string) {
 }
 
 
-export const truncateStr = (str: string, len: number = 8): string => {
+export const truncateStr = (str: string, len: number = 16): string => {
   if (str.length > len) {
     return str.substring(0, len) + "...";
   }

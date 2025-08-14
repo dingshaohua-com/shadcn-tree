@@ -1,4 +1,4 @@
-import { cn } from "@repo/ui/lib/utils";
+import { cn, truncateStr} from "@repo/ui/lib/utils";
 import { TreeDataItem } from "../types";
 
 interface NodeContentProps {
@@ -12,7 +12,7 @@ export const NodeContent = ({ item, level, suffixTitle }: NodeContentProps) => (
     <span
       className={cn("flex gap-1 truncate text-sm", level === 0 && "font-bold")}
     >
-      {item.name}
+      {truncateStr(item.name)}
       {suffixTitle({ item, level })}
     </span>
   </div>
