@@ -3,9 +3,9 @@ import { TreeDataItem } from "../types";
 
 interface NodeCheckboxProps {
   item: TreeDataItem;
-  checkedKeys?: string[];
-  halfCheckedKeys?: string[];
-  onCheckChange?: (itemId: string, checked: boolean) => void;
+  checkedKeys?: (string | number)[];
+  halfCheckedKeys?: (string | number)[];
+  onCheckChange?: (itemId: string | number, checked: boolean) => void;
   onSelectChange?: (item: TreeDataItem) => void;
 }
 

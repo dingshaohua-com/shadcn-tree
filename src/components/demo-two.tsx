@@ -8,9 +8,9 @@ import { getUrlParams, updateUrlParams } from '@/utils/url-helper';
 export default function DemoTwo() {
   const urlParams = getUrlParams();
   
-  const [checkedKeys, setCheckedKeys] = useState<number[]>(urlParams.knPoint || []);
+  const [checkedKeys, setCheckedKeys] = useState<(string | number)[]>(urlParams.knPoint || []);
 
-  const onCheckedChange = (newLeafCheckedKeys: number[]) => {
+  const onCheckedChange = (newLeafCheckedKeys: (string | number)[]) => {
     console.log('Leaf checked keys:', newLeafCheckedKeys);
     setCheckedKeys(newLeafCheckedKeys);
   };
@@ -30,7 +30,7 @@ export default function DemoTwo() {
     setIsOpen(false);
     // 这里可以处理确定后的逻辑
     updateUrlParams({
-      knPoint: checkedKeys,
+      knPoint: checkedKeys.filter(id => typeof id === 'number') as number[],
     });
   };
 

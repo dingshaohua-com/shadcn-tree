@@ -4,19 +4,19 @@ import { TreeNode } from "./tree-node";
 interface TreeListProps {
   data: TreeDataItem[];
   level?: number;
-  selectedItemId?: string;
-  expandedIds: string[];
-  onExpandedChange?: (expandedIds: string[]) => void;
+  selectedItemId?: string | number;
+  expandedIds: (string | number)[];
+  onExpandedChange?: (expandedIds: (string | number)[]) => void;
   onSelectChange?: (item: TreeDataItem) => void;
   checkable?: boolean;
-  checkedKeys?: string[];
-  halfCheckedKeys?: string[];
-  onCheckChange?: (itemId: string, checked: boolean) => void;
-  prefixCheckbox: (arg: {
+  checkedKeys?: (string | number)[];
+  halfCheckedKeys?: (string | number)[];
+  onCheckChange?: (itemId: string | number, checked: boolean) => void;
+  prefixCheckbox?: (arg: {
     item: TreeDataItem;
     level: number;
   }) => React.ReactNode;
-  suffixTitle: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
+  suffixTitle?: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
 }
 
 export const TreeList = ({ data, ...props }: TreeListProps) => (

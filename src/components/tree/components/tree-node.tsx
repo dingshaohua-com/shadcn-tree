@@ -14,19 +14,19 @@ import { TreeList } from "./tree-list";
 interface TreeNodeProps {
   item: TreeDataItem;
   level?: number;
-  selectedItemId?: string;
-  expandedIds: string[];
-  onExpandedChange?: (expandedIds: string[]) => void;
+  selectedItemId?: string | number;
+  expandedIds: (string | number)[];
+  onExpandedChange?: (expandedIds: (string | number)[]) => void;
   onSelectChange?: (item: TreeDataItem) => void;
   checkable?: boolean;
-  checkedKeys?: string[];
-  halfCheckedKeys?: string[];
-  onCheckChange?: (itemId: string, checked: boolean) => void;
-  prefixCheckbox: (arg: {
+  checkedKeys?: (string | number)[];
+  halfCheckedKeys?: (string | number)[];
+  onCheckChange?: (itemId: string | number, checked: boolean) => void;
+  prefixCheckbox?: (arg: {
     item: TreeDataItem;
     level: number;
   }) => React.ReactNode;
-  suffixTitle: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
+  suffixTitle?: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
 }
 
 export const TreeNode = ({
@@ -49,10 +49,14 @@ export const TreeNode = ({
     return (
       <Accordion
         type="multiple"
-        value={expandedIds}
-        onValueChange={onExpandedChange}
+        value={expandedIds.map(id => String(id))}
+        onValueChange={(values) => onExpandedChange?.(values.map(v => {
+          // 尝试转换回原始类型
+          const numValue = Number(v);
+          return isNaN(numValue) ? v : numValue;
+        }))}
       >
-        <AccordionItem value={item.id}>
+        <AccordionItem value={String(item.id)}>
           <div className="flex items-center justify-between">
             {/* 左侧（非根节点） */}
             <AccordionTrigger
@@ -80,7 +84,7 @@ export const TreeNode = ({
             </AccordionTrigger>
             {/* 右侧 */}
             <div className="flex items-center gap-2">
-              {prefixCheckbox({ item, level })}
+              {prefixCheckbox?.({ item, level })}
               {checkable && (
                 <div className="mr-2 flex items-center">
                   <NodeCheckbox
@@ -128,7 +132,7 @@ export const TreeNode = ({
       <NodeContent item={item} level={level} suffixTitle={suffixTitle} />
 
       <div className="flex items-center gap-2">
-        {prefixCheckbox({ item, level })}
+        {prefixCheckbox?.({ item, level })}
         {checkable && (
           <NodeCheckbox
             item={item}

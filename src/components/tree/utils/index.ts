@@ -3,8 +3,8 @@ import { TreeDataItem } from "../types";
 /**
  * 获取节点的所有子节点ID
  */
-export const getAllChildrenIds = (item: TreeDataItem): string[] => {
-  const ids: string[] = [];
+export const getAllChildrenIds = (item: TreeDataItem): (string | number)[] => {
+  const ids: (string | number)[] = [];
   if (item.children) {
     item.children.forEach((child) => {
       ids.push(child.id);
@@ -19,9 +19,9 @@ export const getAllChildrenIds = (item: TreeDataItem): string[] => {
  */
 export const calculateHalfCheckedKeys = (
   data: TreeDataItem[] | TreeDataItem,
-  checkedKeys: string[]
-): string[] => {
-  const halfChecked: string[] = [];
+  checkedKeys: (string | number)[]
+): (string | number)[] => {
+  const halfChecked: (string | number)[] = [];
 
   const calculate = (nodes: TreeDataItem[] | TreeDataItem) => {
     const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
@@ -60,13 +60,13 @@ export const calculateHalfCheckedKeys = (
  */
 export const calculateLeafCheckedKeys = (
   data: TreeDataItem[] | TreeDataItem,
-  checkedKeys: string[]
-): string[] => {
+  checkedKeys: (string | number)[]
+): (string | number)[] => {
   const getLeafCheckedKeys = (
     nodes: TreeDataItem[] | TreeDataItem
-  ): string[] => {
+  ): (string | number)[] => {
     const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
-    const leafKeys: string[] = [];
+    const leafKeys: (string | number)[] = [];
 
     for (const node of nodeArray) {
       const nodeId = node.id;
@@ -102,9 +102,9 @@ export const isLeafNode = (item: TreeDataItem): boolean => {
  */
 export const calculateAllCheckedKeysFromLeaf = (
   data: TreeDataItem[] | TreeDataItem,
-  leafCheckedKeys: string[]
-): string[] => {
-  const allCheckedKeys: string[] = [...leafCheckedKeys];
+  leafCheckedKeys: (string | number)[]
+): (string | number)[] => {
+  const allCheckedKeys: (string | number)[] = [...leafCheckedKeys];
 
   const calculateParentChecked = (nodes: TreeDataItem[] | TreeDataItem) => {
     const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
@@ -139,9 +139,9 @@ export const calculateAllCheckedKeysFromLeaf = (
  */
 export const calculateHalfCheckedKeysFromLeaf = (
   data: TreeDataItem[] | TreeDataItem,
-  leafCheckedKeys: string[]
-): string[] => {
-  const halfChecked: string[] = [];
+  leafCheckedKeys: (string | number)[]
+): (string | number)[] => {
+  const halfChecked: (string | number)[] = [];
   const allCheckedKeys = calculateAllCheckedKeysFromLeaf(data, leafCheckedKeys);
 
   const calculate = (nodes: TreeDataItem[] | TreeDataItem) => {

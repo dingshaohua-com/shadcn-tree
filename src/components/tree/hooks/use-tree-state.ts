@@ -8,16 +8,16 @@ import {
 
 export const useTreeState = (
   data: TreeDataItem[] | TreeDataItem,
-  initialSelectedId?: string,
-  initialLeafCheckedKeys: string[] = []
+  initialSelectedId?: string | number,
+  initialLeafCheckedKeys: (string | number)[] = []
 ) => {
   const [selectedItemId, setSelectedItemId] = React.useState<
-    string | undefined
+    string | number | undefined
   >(initialSelectedId);
-  const [expandedIds, setExpandedIds] = React.useState<string[]>([]);
+  const [expandedIds, setExpandedIds] = React.useState<(string | number)[]>([]);
   // 只存储叶子节点的选中状态
   const [leafCheckedKeys, setLeafCheckedKeys] =
-    React.useState<string[]>(initialLeafCheckedKeys);
+    React.useState<(string | number)[]>(initialLeafCheckedKeys);
 
   // 响应外部 leafCheckedKeys 的变化
   useEffect(() => {
@@ -35,11 +35,11 @@ export const useTreeState = (
   }, [leafCheckedKeys, data]);
 
   const updateCheckState = React.useCallback(
-    (itemId: string, checked: boolean) => {
+    (itemId: string | number, checked: boolean) => {
       let newLeafCheckedKeys = [...leafCheckedKeys];
 
       // 找到被点击的节点
-      const findNode = (nodes: TreeDataItem[] | TreeDataItem, targetId: string): TreeDataItem | null => {
+      const findNode = (nodes: TreeDataItem[] | TreeDataItem, targetId: string | number): TreeDataItem | null => {
         const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
         for (const node of nodeArray) {
           if (node.id === targetId) {
@@ -67,8 +67,8 @@ export const useTreeState = (
         }
       } else {
         // 如果点击的是父节点，需要处理所有子叶子节点
-        const getAllLeafChildren = (node: TreeDataItem): string[] => {
-          const leafIds: string[] = [];
+        const getAllLeafChildren = (node: TreeDataItem): (string | number)[] => {
+          const leafIds: (string | number)[] = [];
           if (isLeafNode(node)) {
             leafIds.push(node.id);
           } else if (node.children) {
