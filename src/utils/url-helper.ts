@@ -1,18 +1,10 @@
 interface UrlParams {
-  phaseId?: number;
-  studyType?: number;
-  subjectId?: number;
-  textbook?: number;
-  knPoint?: string[];
-
+  knPoint?: number[];
   [key: string]: any;
 }
 
 // 定义默认值
 const defaultParams: UrlParams = {
-  phaseId: 0,
-  studyType: 8,
-  subjectId: 2,
   knPoint: [],
 };
 
@@ -31,7 +23,7 @@ export const getUrlParams = (): UrlParams => {
 
   searchParams.forEach((value, key) => {
     if (key === "knPoint") {
-      result.knPoint = value ? value.split(",") : defaultParams.knPoint;
+      result.knPoint = value ? value.split(",").map(item=>Number(item)) : defaultParams.knPoint;
     } else if (key in defaultParams) {
       const typedKey = key as keyof UrlParams;
       if (numberKeys.includes(typedKey)) {

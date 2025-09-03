@@ -21,11 +21,7 @@ export type TreeProps = React.HTMLAttributes<HTMLDivElement> & {
   expandAll?: boolean;
   checkable?: boolean;
   checkedKeys?: string[];
-  onCheckedChange?: (
-    checkedKeys: string[],
-    leafCheckedKeys: string[],
-    halfCheckedKeys: string[]
-  ) => void;
+  onCheckedChange?: (leafCheckedKeys: string[]) => void;
   fieldNames?: FieldNames; // 新增字段别名配置
   prefixCheckbox: (arg: {
     item: TreeDataItem;

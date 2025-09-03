@@ -1,117 +1,103 @@
 import React, { useEffect } from "react";
 import { TreeDataItem } from "../types";
-import { calculateHalfCheckedKeys, getAllChildrenIds } from "../utils";
+import {
+  calculateHalfCheckedKeysFromLeaf,
+  calculateAllCheckedKeysFromLeaf,
+  isLeafNode,
+} from "../utils";
 
 export const useTreeState = (
   data: TreeDataItem[] | TreeDataItem,
   initialSelectedId?: string,
-  initialCheckedKeys: string[] = []
+  initialLeafCheckedKeys: string[] = []
 ) => {
   const [selectedItemId, setSelectedItemId] = React.useState<
     string | undefined
   >(initialSelectedId);
   const [expandedIds, setExpandedIds] = React.useState<string[]>([]);
-  const [checkedKeys, setCheckedKeys] =
-    React.useState<string[]>(initialCheckedKeys);
+  // 只存储叶子节点的选中状态
+  const [leafCheckedKeys, setLeafCheckedKeys] =
+    React.useState<string[]>(initialLeafCheckedKeys);
 
-  // 响应外部 checkedKeys 的变化
+  // 响应外部 leafCheckedKeys 的变化
   useEffect(() => {
-    setCheckedKeys(initialCheckedKeys);
-  }, [initialCheckedKeys]);
+    setLeafCheckedKeys(initialLeafCheckedKeys);
+  }, [initialLeafCheckedKeys]);
 
-  // 计算半选中状态
+  // 基于叶子节点计算所有选中的节点（包括父节点）
+  const checkedKeys = React.useMemo(() => {
+    return calculateAllCheckedKeysFromLeaf(data, leafCheckedKeys);
+  }, [leafCheckedKeys, data]);
+
+  // 基于叶子节点计算半选中状态
   const halfCheckedKeys = React.useMemo(() => {
-    return calculateHalfCheckedKeys(data, checkedKeys);
-  }, [checkedKeys, data]);
+    return calculateHalfCheckedKeysFromLeaf(data, leafCheckedKeys);
+  }, [leafCheckedKeys, data]);
 
   const updateCheckState = React.useCallback(
     (itemId: string, checked: boolean) => {
-      let newCheckedKeys = [...checkedKeys];
+      let newLeafCheckedKeys = [...leafCheckedKeys];
 
-      if (checked) {
-        // 选中：添加当前节点和所有子节点
-        if (!newCheckedKeys.includes(itemId)) {
-          newCheckedKeys.push(itemId);
-        }
-
-        // 找到当前项并添加所有子节点
-        const findAndAddChildren = (nodes: TreeDataItem[] | TreeDataItem) => {
-          const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
-          for (const node of nodeArray) {
-            if (node.id === itemId) {
-              const childrenIds = getAllChildrenIds(node);
-              childrenIds.forEach((childId) => {
-                if (!newCheckedKeys.includes(childId)) {
-                  newCheckedKeys.push(childId);
-                }
-              });
-              break;
-            }
-            if (node.children) {
-              findAndAddChildren(node.children);
-            }
-          }
-        };
-        findAndAddChildren(data);
-      } else {
-        // 取消选中：移除当前节点和所有子节点
-        const findAndRemoveChildren = (
-          nodes: TreeDataItem[] | TreeDataItem
-        ) => {
-          const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
-          for (const node of nodeArray) {
-            if (node.id === itemId) {
-              const childrenIds = getAllChildrenIds(node);
-              newCheckedKeys = newCheckedKeys.filter(
-                (id) => id !== itemId && !childrenIds.includes(id)
-              );
-              break;
-            }
-            if (node.children) {
-              findAndRemoveChildren(node.children);
-            }
-          }
-        };
-        findAndRemoveChildren(data);
-      }
-
-      // 更新父节点的选中状态
-      const updateParentStates = (nodes: TreeDataItem[] | TreeDataItem) => {
+      // 找到被点击的节点
+      const findNode = (nodes: TreeDataItem[] | TreeDataItem, targetId: string): TreeDataItem | null => {
         const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
-
         for (const node of nodeArray) {
-          if (node.children && node.children.length > 0) {
-            // 先递归处理子节点
-            updateParentStates(node.children);
-
-            // 然后处理当前节点
-            const childrenIds = node.children.map((child) => child.id);
-            const checkedChildren = childrenIds.filter((id) =>
-              newCheckedKeys.includes(id)
-            );
-
-            if (checkedChildren.length === 0) {
-              // 没有子节点被选中，移除父节点的选中状态
-              newCheckedKeys = newCheckedKeys.filter((id) => id !== node.id);
-            } else if (checkedChildren.length === childrenIds.length) {
-              // 所有子节点都被选中，父节点完全选中
-              if (!newCheckedKeys.includes(node.id)) {
-                newCheckedKeys.push(node.id);
-              }
-            } else {
-              // 部分子节点被选中，父节点不选中（半选状态由计算属性处理）
-              newCheckedKeys = newCheckedKeys.filter((id) => id !== node.id);
-            }
+          if (node.id === targetId) {
+            return node;
+          }
+          if (node.children) {
+            const found = findNode(node.children, targetId);
+            if (found) return found;
           }
         }
+        return null;
       };
 
-      updateParentStates(data);
-      setCheckedKeys(newCheckedKeys);
+      const clickedNode = findNode(data, itemId);
+      if (!clickedNode) return { newLeafCheckedKeys };
 
-      return { newCheckedKeys };
+      if (isLeafNode(clickedNode)) {
+        // 如果点击的是叶子节点，直接添加或移除
+        if (checked) {
+          if (!newLeafCheckedKeys.includes(itemId)) {
+            newLeafCheckedKeys.push(itemId);
+          }
+        } else {
+          newLeafCheckedKeys = newLeafCheckedKeys.filter(id => id !== itemId);
+        }
+      } else {
+        // 如果点击的是父节点，需要处理所有子叶子节点
+        const getAllLeafChildren = (node: TreeDataItem): string[] => {
+          const leafIds: string[] = [];
+          if (isLeafNode(node)) {
+            leafIds.push(node.id);
+          } else if (node.children) {
+            node.children.forEach(child => {
+              leafIds.push(...getAllLeafChildren(child));
+            });
+          }
+          return leafIds;
+        };
+
+        const leafChildrenIds = getAllLeafChildren(clickedNode);
+
+        if (checked) {
+          // 选中父节点：添加所有子叶子节点
+          leafChildrenIds.forEach(leafId => {
+            if (!newLeafCheckedKeys.includes(leafId)) {
+              newLeafCheckedKeys.push(leafId);
+            }
+          });
+        } else {
+          // 取消选中父节点：移除所有子叶子节点
+          newLeafCheckedKeys = newLeafCheckedKeys.filter(id => !leafChildrenIds.includes(id));
+        }
+      }
+
+      setLeafCheckedKeys(newLeafCheckedKeys);
+      return { newLeafCheckedKeys };
     },
-    [checkedKeys, data, getAllChildrenIds]
+    [leafCheckedKeys, data]
   );
 
   return {
@@ -121,6 +107,7 @@ export const useTreeState = (
     setExpandedIds,
     checkedKeys,
     halfCheckedKeys,
+    leafCheckedKeys,
     updateCheckState,
   };
 };

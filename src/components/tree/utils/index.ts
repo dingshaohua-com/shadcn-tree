@@ -89,3 +89,87 @@ export const calculateLeafCheckedKeys = (
 
   return getLeafCheckedKeys(data);
 };
+
+/**
+ * 检查节点是否为叶子节点
+ */
+export const isLeafNode = (item: TreeDataItem): boolean => {
+  return !item.children || item.children.length === 0;
+};
+
+/**
+ * 根据叶子节点选中状态计算所有应该选中的节点（包括父节点）
+ */
+export const calculateAllCheckedKeysFromLeaf = (
+  data: TreeDataItem[] | TreeDataItem,
+  leafCheckedKeys: string[]
+): string[] => {
+  const allCheckedKeys: string[] = [...leafCheckedKeys];
+
+  const calculateParentChecked = (nodes: TreeDataItem[] | TreeDataItem) => {
+    const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
+
+    for (const node of nodeArray) {
+      if (node.children && node.children.length > 0) {
+        // 先递归处理子节点
+        calculateParentChecked(node.children);
+
+        // 检查所有子节点是否都被选中
+        const allChildrenChecked = node.children.every(child => {
+          if (isLeafNode(child)) {
+            return leafCheckedKeys.includes(child.id);
+          } else {
+            return allCheckedKeys.includes(child.id);
+          }
+        });
+
+        if (allChildrenChecked) {
+          allCheckedKeys.push(node.id);
+        }
+      }
+    }
+  };
+
+  calculateParentChecked(data);
+  return allCheckedKeys;
+};
+
+/**
+ * 根据叶子节点选中状态计算半选中的父节点
+ */
+export const calculateHalfCheckedKeysFromLeaf = (
+  data: TreeDataItem[] | TreeDataItem,
+  leafCheckedKeys: string[]
+): string[] => {
+  const halfChecked: string[] = [];
+  const allCheckedKeys = calculateAllCheckedKeysFromLeaf(data, leafCheckedKeys);
+
+  const calculate = (nodes: TreeDataItem[] | TreeDataItem) => {
+    const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
+
+    for (const node of nodeArray) {
+      if (node.children && node.children.length > 0) {
+        // 先递归处理子节点
+        calculate(node.children);
+
+        // 如果当前节点没有被完全选中，但有子节点被选中，则为半选中
+        if (!allCheckedKeys.includes(node.id)) {
+          const hasCheckedChildren = node.children.some(child => {
+            if (isLeafNode(child)) {
+              return leafCheckedKeys.includes(child.id);
+            } else {
+              return allCheckedKeys.includes(child.id) || halfChecked.includes(child.id);
+            }
+          });
+
+          if (hasCheckedChildren) {
+            halfChecked.push(node.id);
+          }
+        }
+      }
+    }
+  };
+
+  calculate(data);
+  return halfChecked;
+};

@@ -1,37 +1,19 @@
 import { Tree } from './tree';
 import { useState } from 'react';
 import { treeDate } from '../utils/mock-data';
-import { updateUrlParams } from '@/utils/url-helper';
 import { Button } from '@/components/ui/components/button';
 import { Dialog, DialogContent, DialogTrigger, DialogTitle, DialogDescription } from '@/components/ui/components/dialog';
-
-interface SuffixTitle {
-  item: {
-    bizTreeNodeId: number; // 节点 ID
-    bizTreeNodeName: string; // 节点名称
-    bizTreeParentNodeId: number; // 父节点 ID
-    bizTreeNodeSiblingOrder: number; // 兄弟节点排序
-    bizTreeNodeLevel: number; // 节点层级
-    bizTreeNodeSerialPath: string; // 节点序列路径
-    weakCount: number; // 知识薄弱数量
-    allLearnCount: number; // 总学习次数
-    learnCount: number; // 已学习次数
-    shelfStatus?: number; // 上架状态（可选）
-    shelfOnLeafNodeStat?: string; // 叶子节点上架状态（可选）
-    wrongQuestionCount?: number; // 错题数量（可选）
-    isWeak?: number; // 是否薄弱（可选）
-  };
-  level: number;
-}
+import { getUrlParams, updateUrlParams } from '@/utils/url-helper';
 
 export default function DemoTwo() {
+  const urlParams = getUrlParams();
+  
+  const [checkedKeys, setCheckedKeys] = useState<number[]>(urlParams.knPoint || []);
 
-  const checkedKeys = [];
-
-  const onCheckedChange = (...arg)=>{
-    console.log(123, arg);
-    
-  }
+  const onCheckedChange = (newLeafCheckedKeys: number[]) => {
+    console.log('Leaf checked keys:', newLeafCheckedKeys);
+    setCheckedKeys(newLeafCheckedKeys);
+  };
 
   // 保存完整的选中状态，包括所有选中的节点ID
   // 控制 DropdownMenu 的开关状态
@@ -39,31 +21,29 @@ export default function DemoTwo() {
 
 
   const handleClear = () => {
-  setIsOpen(false);
+    setCheckedKeys([]);
+    setIsOpen(false);
   };
 
   const handleOk = () => {
+    console.log('确定选择的叶子节点:', checkedKeys);
     setIsOpen(false);
-    // // 同步至外层
-    // syncSureState();
-    // // 关闭下拉菜单
-    // setIsOpen(false);
-    // updateUrlParams({
-    //   knPoint: leafCheckedKeysSure,
-    // });
+    // 这里可以处理确定后的逻辑
+    updateUrlParams({
+      knPoint: checkedKeys,
+    });
   };
 
   return (
     <div className="p-10">
-      {/* <div className="mb-4">
+      <div className="mb-4">
         <div className="text-sm text-gray-600 flex gap-2">
-          <div>选中的节点:</div>
-          <div className="flex">
-            <div>所有{allCheckedKeysSure.length} 个，</div>
-            <div>末级{leafCheckedKeysSure.length} 个</div>
-          </div>
+          <div>已选中的叶子节点: {checkedKeys.length} 个</div>
         </div>
-      </div> */}
+        <div className="text-xs text-gray-400 mt-1">
+          {checkedKeys.join(', ')}
+        </div>
+      </div>
 
       <Dialog open={isOpen} onOpenChange={setIsOpen}>
         <DialogTrigger>
@@ -73,16 +53,18 @@ export default function DemoTwo() {
           <div className="flex-1 overflow-y-auto">
             <DialogTitle />
             <DialogDescription />
+            <div>{JSON.stringify(checkedKeys)}</div>
             <Tree
               data={treeDate}
               checkable={true}
-              checkedKeys={checkedKeys} // 传入保存的选中状态
+              checkedKeys={checkedKeys} // 传入叶子节点选中状态
               onCheckedChange={onCheckedChange}
               fieldNames={{
                 key: 'bizTreeNodeId',
                 title: 'bizTreeNodeName',
                 children: 'bizTreeNodeChildren',
               }}
+             
             />
           </div>
 

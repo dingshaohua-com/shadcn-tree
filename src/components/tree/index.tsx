@@ -5,7 +5,6 @@ import React from "react";
 import { TreeList } from "./components/tree-list";
 import { useTreeState } from "./hooks/use-tree-state";
 import { TreeDataItem, TreeProps } from "./types";
-import { calculateHalfCheckedKeys, calculateLeafCheckedKeys } from "./utils";
 
 const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
   (
@@ -57,6 +56,7 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
       setExpandedIds,
       checkedKeys: currentCheckedKeys,
       halfCheckedKeys,
+      leafCheckedKeys,
       updateCheckState,
     } = useTreeState(normalizedData, initialSlelectedItemId, checkedKeys);
 
@@ -70,25 +70,12 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
 
     const handleCheckChange = React.useCallback(
       (itemId: string, checked: boolean) => {
-        const { newCheckedKeys } = updateCheckState(itemId, checked);
+        const { newLeafCheckedKeys } = updateCheckState(itemId, checked);
 
-        // 基于新的 checkedKeys 重新计算 halfCheckedKeys 和 leafCheckedKeys
-        const newHalfCheckedKeys = calculateHalfCheckedKeys(
-          normalizedData,
-          newCheckedKeys
-        );
-        const newLeafCheckedKeys = calculateLeafCheckedKeys(
-          normalizedData,
-          newCheckedKeys
-        );
-
-        onCheckedChange?.(
-          newCheckedKeys,
-          newLeafCheckedKeys,
-          newHalfCheckedKeys
-        );
+        // 只传递叶子节点的选中状态
+        onCheckedChange?.(newLeafCheckedKeys);
       },
-      [updateCheckState, onCheckedChange, normalizedData]
+      [updateCheckState, onCheckedChange]
     );
 
     const treeData = normalizedData;
