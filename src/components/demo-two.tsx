@@ -53,7 +53,6 @@ export default function DemoTwo() {
           <div className="flex-1 overflow-y-auto">
             <DialogTitle />
             <DialogDescription />
-            <div>{JSON.stringify(checkedKeys)}</div>
             <Tree
               data={treeDate}
               checkable={true}

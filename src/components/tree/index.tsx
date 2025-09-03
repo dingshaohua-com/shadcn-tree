@@ -10,7 +10,7 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
   (
     {
       data,
-      initialSlelectedItemId,
+      initialSelectedItemId,
       onSelectChange,
       checkable = false,
       checkedKeys = [],
@@ -56,9 +56,8 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
       setExpandedIds,
       checkedKeys: currentCheckedKeys,
       halfCheckedKeys,
-      leafCheckedKeys,
       updateCheckState,
-    } = useTreeState(normalizedData, initialSlelectedItemId, checkedKeys);
+    } = useTreeState(normalizedData, initialSelectedItemId, checkedKeys);
 
     const handleSelectChange = React.useCallback(
       (item: TreeDataItem) => {

@@ -16,7 +16,7 @@ export interface TreeDataItem {
 export type TreeProps = React.HTMLAttributes<HTMLDivElement> & {
   // data: TreeDataItem[] | TreeDataItem;
   data: any;
-  initialSlelectedItemId?: string | number;
+  initialSelectedItemId?: string | number;
   onSelectChange?: (item: TreeDataItem | undefined) => void;
   expandAll?: boolean;
   checkable?: boolean;
