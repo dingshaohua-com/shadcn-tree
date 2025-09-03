@@ -32,13 +32,19 @@ export const calculateHalfCheckedKeys = (
         calculate(node.children);
 
         // 计算当前节点的状态
-        const childrenIds = node.children.map(child => child.id);
-        const checkedChildren = childrenIds.filter(id => checkedKeys.includes(id));
-        const halfCheckedChildren = childrenIds.filter(id => halfChecked.includes(id));
+        const childrenIds = node.children.map((child) => child.id);
+        const checkedChildren = childrenIds.filter((id) =>
+          checkedKeys.includes(id)
+        );
+        const halfCheckedChildren = childrenIds.filter((id) =>
+          halfChecked.includes(id)
+        );
 
         // 如果有部分子节点被选中或半选中，但不是全部，则当前节点为半选中
-        if ((checkedChildren.length > 0 || halfCheckedChildren.length > 0) &&
-            checkedChildren.length < childrenIds.length) {
+        if (
+          (checkedChildren.length > 0 || halfCheckedChildren.length > 0) &&
+          checkedChildren.length < childrenIds.length
+        ) {
           halfChecked.push(node.id);
         }
       }
@@ -56,7 +62,9 @@ export const calculateLeafCheckedKeys = (
   data: TreeDataItem[] | TreeDataItem,
   checkedKeys: string[]
 ): string[] => {
-  const getLeafCheckedKeys = (nodes: TreeDataItem[] | TreeDataItem): string[] => {
+  const getLeafCheckedKeys = (
+    nodes: TreeDataItem[] | TreeDataItem
+  ): string[] => {
     const nodeArray = Array.isArray(nodes) ? nodes : [nodes];
     const leafKeys: string[] = [];
 

@@ -22,8 +22,11 @@ interface TreeNodeProps {
   checkedKeys?: string[];
   halfCheckedKeys?: string[];
   onCheckChange?: (itemId: string, checked: boolean) => void;
-  prefixCheckbox?: (arg:{item: TreeDataItem, level: number}) => React.ReactNode;
-  suffixTitle?: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
+  prefixCheckbox: (arg: {
+    item: TreeDataItem;
+    level: number;
+  }) => React.ReactNode;
+  suffixTitle: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
 }
 
 export const TreeNode = ({
@@ -38,7 +41,7 @@ export const TreeNode = ({
   halfCheckedKeys,
   onCheckChange,
   prefixCheckbox,
-  suffixTitle
+  suffixTitle,
 }: TreeNodeProps) => {
   const hasChildren = item.children && item.children.length > 0;
 
@@ -51,8 +54,8 @@ export const TreeNode = ({
       >
         <AccordionItem value={item.id}>
           <div className="flex items-center justify-between">
+            {/* 左侧（非根节点） */}
             <AccordionTrigger
-              hideChevron={true}
               className={cn(
                 "before:bg-muted/80 flex-1 px-2 before:absolute before:left-0 before:-z-10 before:h-[1.75rem] before:w-full before:opacity-0 hover:no-underline hover:before:opacity-100",
                 selectedItemId === item.id &&
@@ -62,19 +65,24 @@ export const TreeNode = ({
             >
               <div className="flex items-center gap-1">
                 <TriangleFill
-                  width={12}
                   className={cn(
-                    "rotate-270 transition-transform duration-200",
+                    "rotate-270 h-1 w-2 transition-transform duration-200",
                     expandedIds.includes(item.id) && "rotate-360"
                   )}
                 />
-                <NodeContent item={item} level={level} suffixTitle={suffixTitle} />
+                {/* 左侧标题 */}
+                <NodeContent
+                  item={item}
+                  level={level}
+                  suffixTitle={suffixTitle}
+                />
               </div>
             </AccordionTrigger>
+            {/* 右侧 */}
             <div className="flex items-center gap-2">
-              {prefixCheckbox({item, level})}
+              {prefixCheckbox({ item, level })}
               {checkable && (
-                <div className="mr-2">
+                <div className="mr-2 flex items-center">
                   <NodeCheckbox
                     item={item}
                     checkedKeys={checkedKeys}
@@ -116,10 +124,11 @@ export const TreeNode = ({
       )}
       onClick={() => onSelectChange?.(item)}
     >
+      {/* 根节点 */}
       <NodeContent item={item} level={level} suffixTitle={suffixTitle} />
 
       <div className="flex items-center gap-2">
-        {prefixCheckbox({item, level})}
+        {prefixCheckbox({ item, level })}
         {checkable && (
           <NodeCheckbox
             item={item}

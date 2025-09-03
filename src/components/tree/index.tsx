@@ -18,18 +18,23 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
       onCheckedChange,
       fieldNames = {},
       className,
-      prefixCheckbox,
-      suffixTitle,
+      prefixCheckbox = () => null,
+      suffixTitle = () => null,
       ...props
     },
     ref
   ) => {
+    console.log(data);
+
     // 填充默认字段名
-    const mergedFieldNames = React.useMemo(() => ({
-      title: fieldNames.title || 'name',
-      key: fieldNames.key || 'id', 
-      children: fieldNames.children || 'children'
-    }), [fieldNames]);
+    const mergedFieldNames = React.useMemo(
+      () => ({
+        title: fieldNames.title || "name",
+        key: fieldNames.key || "id",
+        children: fieldNames.children || "children",
+      }),
+      [fieldNames]
+    );
 
     // 转换数据格式
     const normalizedData = React.useMemo(() => {
@@ -38,7 +43,7 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
         name: item[mergedFieldNames.title],
         icon: item.icon,
         children: item[mergedFieldNames.children]?.map(normalizeItem),
-        ...item // 保留原始数据
+        ...item, // 保留原始数据
       });
 
       const rawData = Array.isArray(data) ? data : [data];
@@ -68,10 +73,20 @@ const Tree = React.forwardRef<HTMLDivElement, TreeProps>(
         const { newCheckedKeys } = updateCheckState(itemId, checked);
 
         // 基于新的 checkedKeys 重新计算 halfCheckedKeys 和 leafCheckedKeys
-        const newHalfCheckedKeys = calculateHalfCheckedKeys(normalizedData, newCheckedKeys);
-        const newLeafCheckedKeys = calculateLeafCheckedKeys(normalizedData, newCheckedKeys);
+        const newHalfCheckedKeys = calculateHalfCheckedKeys(
+          normalizedData,
+          newCheckedKeys
+        );
+        const newLeafCheckedKeys = calculateLeafCheckedKeys(
+          normalizedData,
+          newCheckedKeys
+        );
 
-        onCheckedChange?.(newCheckedKeys, newLeafCheckedKeys, newHalfCheckedKeys, );
+        onCheckedChange?.(
+          newCheckedKeys,
+          newLeafCheckedKeys,
+          newHalfCheckedKeys
+        );
       },
       [updateCheckState, onCheckedChange, normalizedData]
     );

@@ -1,5 +1,5 @@
-import { TreeNode } from './tree-node';
-import { TreeDataItem } from '../types';
+import { TreeDataItem } from "../types";
+import { TreeNode } from "./tree-node";
 
 interface TreeListProps {
   data: TreeDataItem[];
@@ -12,8 +12,11 @@ interface TreeListProps {
   checkedKeys?: string[];
   halfCheckedKeys?: string[];
   onCheckChange?: (itemId: string, checked: boolean) => void;
-  prefixCheckbox?: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
-  suffixTitle?: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
+  prefixCheckbox: (arg: {
+    item: TreeDataItem;
+    level: number;
+  }) => React.ReactNode;
+  suffixTitle: (arg: { item: TreeDataItem; level: number }) => React.ReactNode;
 }
 
 export const TreeList = ({ data, ...props }: TreeListProps) => (
